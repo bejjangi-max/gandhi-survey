@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>제천간디학교 성인지 감수성 측정기</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --primary: #5c6bc0; --primary-light: #e8eaf6; --accent: #ec407a;
+    --bg: #f0f2f5; --card: #ffffff; --text: #1a1a2e; --sub: #6b7280; --border: #e5e7eb;
+    --cat1:#5c6bc0; --cat2:#26a69a; --cat3:#ef5350; --cat4:#ab47bc; --cat5:#ff7043; --cat6:#42a5f5;
+  }
+  html { width: 100%; height: 100%; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  body { font-family: -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; width: 100%; font-size: 16px; }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 0 0 80px; }
+  .site-header { text-align: center; padding: 28px 20px 20px; background: linear-gradient(135deg, #5c6bc0, #7986cb); color: #fff; }
+  .site-header .emoji { font-size: 2.4rem; }
+  .site-header h1 { font-size: 1.25rem; font-weight: 800; margin-top: 8px; line-height: 1.5; }
+  .site-header p { font-size: 0.9rem; margin-top: 5px; opacity: .85; }
+  .nav-tabs { display: flex; background: #fff; border-bottom: 2px solid var(--border); position: sticky; top: 0; z-index: 100; }
+  .nav-tab { flex: 1; padding: 16px 4px; border: none; background: none; font-size: 0.95rem; font-weight: 600; color: var(--sub); cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all .2s; }
+  .nav-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+  .tab-body { padding: 16px; }
+  .card { background: var(--card); border-radius: 16px; padding: 20px; margin-bottom: 14px; box-shadow: 0 1px 6px rgba(0,0,0,.07); }
+  .screen { display: none; }
+  .screen.active { display: block; }
+  .intro-hero { text-align: center; padding: 4px 0 16px; }
+  .intro-hero .big-em { font-size: 3.2rem; }
+  .intro-hero h2 { font-size: 1.2rem; font-weight: 800; margin: 10px 0 6px; color: var(--primary); }
+  .intro-hero p { color: var(--sub); font-size: 0.92rem; line-height: 1.7; }
+  .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 16px 0; }
+  .cat-item { display: flex; align-items: center; gap: 7px; font-size: 0.88rem; font-weight: 600; padding: 12px 11px; border-radius: 10px; background: var(--primary-light); color: var(--primary); }
+  .btn { display: block; width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all .15s; text-align: center; }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:active { background: #3f51b5; transform: scale(.98); }
+  .btn-outline { background: none; border: 2px solid var(--primary); color: var(--primary); }
+  .btn-outline:active { background: var(--primary-light); }
+  .btn-row { display: flex; gap: 10px; }
+  .btn-row .btn { flex: 1; }
+  .form-group { margin-bottom: 18px; }
+  .form-group label { display: block; font-size: 0.95rem; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+  .form-group input, .form-group select { width: 100%; padding: 14px; border: 2px solid var(--border); border-radius: 10px; font-size: 1rem; outline: none; background: #fff; color: var(--text); -webkit-appearance: none; appearance: none; }
+  .form-group input:focus, .form-group select:focus { border-color: var(--primary); }
+  .radio-row { display: flex; gap: 7px; flex-wrap: wrap; }
+  .radio-row label { flex: 1; min-width: 60px; }
+  .radio-row input { display: none; }
+  .radio-pill { display: block; padding: 13px 4px; border: 2px solid var(--border); border-radius: 10px; text-align: center; font-size: 0.88rem; font-weight: 600; cursor: pointer; color: var(--sub); transition: all .15s; }
+  .radio-row input:checked + .radio-pill { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
+  .parent-toggle { display: flex; gap: 10px; }
+  .parent-toggle label { flex: 1; }
+  .parent-toggle input { display: none; }
+  .parent-pill { display: block; padding: 18px 8px; border: 2px solid var(--border); border-radius: 12px; text-align: center; font-size: 0.95rem; font-weight: 700; cursor: pointer; color: var(--sub); transition: all .15s; line-height: 1.5; }
+  .parent-toggle input:checked + .parent-pill { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
+  .parent-note { font-size: 0.83rem; color: var(--sub); margin-top: 8px; line-height: 1.6; padding: 10px 12px; background: #f9fafb; border-radius: 8px; }
+  .progress-wrap { padding: 0 0 16px; }
+  .progress-meta { display: flex; justify-content: space-between; font-size: 0.88rem; color: var(--sub); margin-bottom: 7px; font-weight: 600; }
+  .progress-bar { height: 8px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent)); border-radius: 99px; transition: width .4s ease; }
+  .cat-hd { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 2px solid var(--border); }
+  .cat-badge { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+  .cat-hd h3 { font-size: 1.05rem; font-weight: 800; }
+  .q-block { padding: 16px 0; border-bottom: 1px solid var(--border); }
+  .q-block:last-child { border-bottom: none; padding-bottom: 0; }
+  .q-text { font-size: 0.97rem; font-weight: 600; line-height: 1.7; margin-bottom: 14px; }
+  .q-num-badge { display: inline-block; background: var(--primary-light); color: var(--primary); font-size: 0.78rem; font-weight: 800; padding: 2px 8px; border-radius: 6px; margin-right: 5px; vertical-align: middle; }
+  .q-reverse { display: inline-block; background: #fce4ec; color: #c2185b; font-size: 0.72rem; font-weight: 800; padding: 2px 6px; border-radius: 6px; margin-left: 4px; vertical-align: middle; }
+  .scale-row { display: flex; gap: 6px; }
+  .scale-row label { flex: 1; }
+  .scale-row input { display: none; }
+  .scale-cell { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 4px; border: 2px solid var(--border); border-radius: 10px; cursor: pointer; transition: all .15s; min-height: 68px; justify-content: center; }
+  .scale-num { width: 32px; height: 32px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.92rem; font-weight: 800; color: #fff; transition: background .15s; }
+  .scale-lbl { font-size: 0.65rem; color: var(--sub); text-align: center; line-height: 1.3; }
+  .scale-row input:checked + .scale-cell { border-color: var(--primary); background: var(--primary-light); }
+  .scale-row input:checked + .scale-cell .scale-num { background: var(--primary); }
+  .scale-row input:checked + .scale-cell .scale-lbl { color: var(--primary); font-weight: 700; }
+  .result-top { text-align: center; padding: 8px 0 20px; }
+  .result-name { font-size: 0.9rem; color: var(--sub); margin-bottom: 4px; }
+  .result-big { font-size: 3.4rem; font-weight: 900; color: var(--primary); line-height: 1; }
+  .result-sub { font-size: 1rem; color: var(--sub); margin-top: 2px; }
+  .grade-pill { display: inline-block; margin: 10px auto; padding: 8px 24px; border-radius: 99px; font-size: 0.95rem; font-weight: 800; }
+  .result-msg { font-size: 0.9rem; color: var(--sub); line-height: 1.7; margin-top: 8px; }
+  .cat-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin: 6px 0; }
+  .ccard { padding: 14px; border-radius: 12px; }
+  .ccard-name { font-size: 0.78rem; font-weight: 700; margin-bottom: 5px; }
+  .ccard-score { font-size: 1.4rem; font-weight: 900; }
+  .cbar { height: 5px; border-radius: 99px; background: rgba(255,255,255,.35); margin-top: 6px; overflow: hidden; }
+  .cfill { height: 100%; border-radius: 99px; background: rgba(255,255,255,.8); transition: width 1s; }
+  .radar-wrap { position: relative; height: 260px; }
+  .stat-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 14px; }
+  .sbox { background: var(--card); border-radius: 12px; padding: 16px 8px; text-align: center; box-shadow: 0 1px 5px rgba(0,0,0,.07); }
+  .sbox .sv { font-size: 1.8rem; font-weight: 900; color: var(--primary); }
+  .sbox .sl { font-size: 0.78rem; color: var(--sub); margin-top: 2px; }
+  .ch-wrap { position: relative; height: 240px; }
+  .empty { text-align: center; padding: 40px 20px; color: var(--sub); }
+  .empty .ei { font-size: 3rem; margin-bottom: 12px; }
+  .spinner { display:inline-block; width:28px; height:28px; border:3px solid var(--border); border-top-color:var(--primary); border-radius:50%; animation:spin .8s linear infinite; margin-right:8px; vertical-align:middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="site-header">
+    <div class="emoji">🌱</div>
+    <h1>제천간디학교<br>성인지 감수성 측정기</h1>
+    <p>우리 가족의 성평등 감수성을 함께 점검해 보아요</p>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="goTab('survey')">📝 설문 참여</button>
+    <button class="nav-tab" onclick="goTab('stats')">📊 통계 보기</button>
+  </div>
+
+  <div id="tab-survey">
+    <div id="screen-intro" class="screen active">
+      <div class="tab-body">
+        <div class="card">
+          <div class="intro-hero">
+            <div class="big-em">💚</div>
+            <h2>성인지 감수성을 측정해 보세요</h2>
+            <p>총 6개 영역, 30개 문항으로 구성되어 있으며<br>응답 시간은 약 5~10분입니다.</p>
+          </div>
+          <div class="cat-grid">
+            <div class="cat-item"><span>📘</span>성평등 인식</div>
+            <div class="cat-item"><span>📗</span>고정관념·차별</div>
+            <div class="cat-item"><span>📙</span>성폭력과 동의</div>
+            <div class="cat-item"><span>📒</span>디지털 성인지</div>
+            <div class="cat-item"><span>📕</span>가족 내 성인지</div>
+            <div class="cat-item"><span>📓</span>양육자 실천</div>
+          </div>
+          <button class="btn btn-primary" onclick="goScreen('info')">시작하기 →</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="screen-info" class="screen">
+      <div class="tab-body">
+        <div class="card">
+          <h3 style="font-size:1.05rem;font-weight:800;margin-bottom:20px;">👤 기본 정보 입력</h3>
+          <div class="form-group">
+            <label>이름 또는 별명 *</label>
+            <input type="text" id="inp-name" placeholder="예: 홍길동 / 별명" maxlength="20" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label>성별 *</label>
+            <div class="radio-row">
+              <label><input type="radio" name="gender" value="남성"><span class="radio-pill">남성</span></label>
+              <label><input type="radio" name="gender" value="여성"><span class="radio-pill">여성</span></label>
+              <label><input type="radio" name="gender" value="기타"><span class="radio-pill">기타</span></label>
+              <label><input type="radio" name="gender" value="무응답"><span class="radio-pill">무응답</span></label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>연령대 *</label>
+            <select id="inp-age">
+              <option value="">-- 선택 --</option>
+              <option>10대</option><option>20대</option><option>30대</option>
+              <option>40대</option><option>50대</option><option>60대 이상</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>양육자 여부 *</label>
+            <div class="parent-toggle">
+              <label><input type="radio" name="parent" value="양육자"><span class="parent-pill">👨‍👧 양육자<br><small style="font-weight:500;font-size:.82rem;">자녀가 있어요</small></span></label>
+              <label><input type="radio" name="parent" value="비양육자"><span class="parent-pill">🙋 비양육자<br><small style="font-weight:500;font-size:.82rem;">자녀가 없어요</small></span></label>
+            </div>
+            <div class="parent-note">💡 양육자 여부에 따라 일부 문항이 맞춤형으로 조정됩니다.</div>
+          </div>
+          <div class="btn-row" style="margin-top:8px;">
+            <button class="btn btn-outline" onclick="goScreen('intro')">← 이전</button>
+            <button class="btn btn-primary" onclick="startSurvey()">설문 시작 →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="screen-survey" class="screen">
+      <div class="tab-body">
+        <div class="progress-wrap">
+          <div class="progress-meta"><span id="prog-cat">카테고리 1/6</span><span id="prog-pct">0%</span></div>
+          <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+        </div>
+        <div class="card">
+          <div id="survey-content"></div>
+          <div class="btn-row" style="margin-top:22px;">
+            <button class="btn btn-outline" id="btn-prev" onclick="prevCat()">← 이전</button>
+            <button class="btn btn-primary" id="btn-next" onclick="nextCat()">다음 →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="screen-result" class="screen">
+      <div class="tab-body">
+        <div class="card" id="result-card"></div>
+        <div class="btn-row" style="margin-top:4px;">
+          <button class="btn btn-outline" onclick="resetSurvey()">다시 참여</button>
+          <button class="btn btn-primary" onclick="goTab('stats')">📊 통계 보기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-stats" style="display:none;">
+    <div class="tab-body"><div id="stats-content"></div></div>
+  </div>
+</div>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzxc-LuSEXl0mlkLqhU-rThoPPutdjvspKwk5SMXIVHplrvnsDDIUrLfwBpaNzMk1CGFA/exec';
+
+const CATS = [
+  {id:1,emoji:'📘',color:'var(--cat1)',bg:'#e8eaf6',label:'성평등 인식'},
+  {id:2,emoji:'📗',color:'var(--cat2)',bg:'#e0f2f1',label:'고정관념·차별 민감도'},
+  {id:3,emoji:'📙',color:'var(--cat3)',bg:'#ffebee',label:'성폭력과 동의'},
+  {id:4,emoji:'📒',color:'var(--cat4)',bg:'#f3e5f5',label:'디지털 성인지'},
+  {id:5,emoji:'📕',color:'var(--cat5)',bg:'#fbe9e7',label:'가족 내 성인지'},
+  {id:6,emoji:'📓',color:'var(--cat6)',bg:'#e3f2fd',label:'양육자 실천'}
+];
+
+const REVERSED = [3, 5, 6, 7, 10, 12, 13, 22];
+
+const QS_PARENT = [
+  ['여성 상사가 남성 부하직원에게 업무 지시를 하는 것이 자연스럽게 느껴진다.','가사와 육아는 부부가 함께 분담해야 할 공동의 책임이다.','남자아이와 여자아이 모두 요리·청소 같은 가사일을 배워야 한다.','맞벌이 부부라도 아이가 아프면 엄마가 먼저 회사를 빠지는 게 현실적이다.','성평등은 법과 제도뿐 아니라 일상적인 태도에서부터 시작된다.'],
+  ['술자리에서의 성적 농담은 분위기를 위한 것이므로 크게 문제가 되지 않는다.','육아휴직을 쓰는 남성 동료를 보면 승진을 포기한 것처럼 느껴진다.','고객 응대나 감정노동은 여성이 더 잘 어울린다고 생각한 적이 있다.','"남자는 원래 그래", "여자니까 그렇지" 같은 말은 차별적 표현이라고 생각한다.','어린이용 장난감이나 색깔이 성별로 구분되는 것이 불편하게 느껴진다.'],
+  ['피해자가 즉시 거부 의사를 표현하지 않았다면 어느 정도 동의한 것으로 볼 수 있다.','사소한 신체 접촉이나 성적 언동도 상대가 불쾌했다면 성희롱이 될 수 있다.','옷차림이 노출이 심한 사람이 성희롱을 당했다면 본인에게도 일부 책임이 있다.','성희롱 피해자가 바로 신고하지 않은 것은 피해가 심각하지 않았다는 뜻이다.','상대가 불편함을 표현하면 즉시 행동을 멈추는 것이 당연하다고 생각한다.'],
+  ['아이가 보는 영상·게임에 성차별적 표현이 있는지 함께 살펴본 적이 있다.','온라인에서 여성이나 남성을 비하하는 댓글을 보면 그냥 넘기지 않는다.','외모를 과도하게 강조하는 SNS 콘텐츠는 아이의 자아상에 해롭다고 생각한다.','아이가 온라인에서 성적 표현물을 접했을 때 함께 이야기 나눌 준비가 되어 있다.','디지털 공간에서도 성평등한 언어와 태도가 필요하다고 생각한다.'],
+  ['우리 가족의 역할 분담은 성별이 아닌 능력과 상황에 따라 이루어지고 있다.','자녀에게 "남자답게" 또는 "여자답게"라는 말을 의식적으로 피하려 한다.','자녀가 성별 고정 역할 놀이(공주·왕자 등)를 원할 때 아무 생각 없이 맞춰준다.','자녀의 성별과 관계없이 동등한 기대와 기회를 주려고 노력한다.','가족 안에서도 서로의 경계와 감정을 존중하는 것이 중요하다고 생각한다.'],
+  ['성평등한 가치관을 자녀에게 어떻게 전달할지 구체적으로 고민해 본 적이 있다.','자녀가 "왜 엄마만 밥을 해요?"라고 물으면 솔직하게 이야기할 수 있다.','성폭력이나 차별 관련 뉴스를 자녀와 함께 이야기하는 것이 중요하다고 생각한다.','자녀가 성평등 감수성을 키울 수 있도록 책·영상 등 환경을 의식적으로 선택한다.','나 자신의 성인지 감수성을 점검하고 성장시킬 필요성을 느낀다.']
+];
+
+const QS_NON = [
+  ['여성 상사가 남성 부하직원에게 업무 지시를 하는 것이 자연스럽게 느껴진다.','가사와 육아는 성별과 관계없이 함께 분담해야 할 공동의 책임이다.','남녀 모두 요리·청소 같은 가사일을 할 줄 알아야 한다고 생각한다.','맞벌이 부부라도 아이가 아프면 엄마가 먼저 회사를 빠지는 게 현실적이다.','성평등은 법과 제도뿐 아니라 일상적인 태도에서부터 시작된다.'],
+  ['술자리에서의 성적 농담은 분위기를 위한 것이므로 크게 문제가 되지 않는다.','육아휴직을 쓰는 남성 동료를 보면 승진을 포기한 것처럼 느껴진다.','고객 응대나 감정노동은 여성이 더 잘 어울린다고 생각한 적이 있다.','"남자는 원래 그래", "여자니까 그렇지" 같은 말은 차별적 표현이라고 생각한다.','어린이용 장난감이나 색깔이 성별로 구분되는 것이 불편하게 느껴진다.'],
+  ['피해자가 즉시 거부 의사를 표현하지 않았다면 어느 정도 동의한 것으로 볼 수 있다.','사소한 신체 접촉이나 성적 언동도 상대가 불쾌했다면 성희롱이 될 수 있다.','옷차림이 노출이 심한 사람이 성희롱을 당했다면 본인에게도 일부 책임이 있다.','성희롱 피해자가 바로 신고하지 않은 것은 피해가 심각하지 않았다는 뜻이다.','상대가 불편함을 표현하면 즉시 행동을 멈추는 것이 당연하다고 생각한다.'],
+  ['온라인 콘텐츠에 성차별적 표현이 있는지 주의 깊게 살펴보는 편이다.','온라인에서 여성이나 남성을 비하하는 댓글을 보면 그냥 넘기지 않는다.','외모를 과도하게 강조하는 SNS 콘텐츠는 사회적으로 해롭다고 생각한다.','주변 사람이 온라인 성적 표현물 문제를 겪을 때 함께 이야기 나눌 수 있다.','디지털 공간에서도 성평등한 언어와 태도가 필요하다고 생각한다.'],
+  ['내가 속한 공동체의 역할 분담은 성별이 아닌 능력과 상황에 따라 이루어진다.','주변 아이에게 "남자답게" 또는 "여자답게"라는 표현을 의식적으로 피하려 한다.','아이가 성별 고정 역할 놀이(공주·왕자 등)를 원할 때 아무 생각 없이 맞춰준다.','주변 아이들에게 성별과 관계없이 동등한 기대와 기회를 주려고 노력한다.','가까운 관계에서도 서로의 경계와 감정을 존중하는 것이 중요하다고 생각한다.'],
+  ['성평등한 가치관을 주변 사람들에게 어떻게 전달할지 고민해 본 적이 있다.','성과 관련된 주제에 대해 주변과 편안하게 대화할 수 있다.','성폭력이나 차별 문제를 주변 사람들과 이야기하는 것이 중요하다고 생각한다.','내 주변에서 성평등한 문화를 만들기 위해 작은 실천이라도 하려고 노력한다.','나 자신의 성인지 감수성을 점검하고 성장시킬 필요성을 느낀다.']
+];
+
+const SLABELS = ['전혀\n그렇지\n않다','그렇지\n않다','보통\n이다','그렇다','매우\n그렇다'];
+let answers={}, curCat=0, userInfo={}, charts={}, QS=QS_PARENT;
+
+async function api(method, body) {
+  if (method==='GET') { const r=await fetch(SCRIPT_URL+'?action=getStats'); return r.json(); }
+  const r=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(body)}); return r.json();
+}
+function goTab(t) {
+  document.querySelectorAll('.nav-tab').forEach((el,i)=>el.classList.toggle('active',(i===0&&t==='survey')||(i===1&&t==='stats')));
+  document.getElementById('tab-survey').style.display=t==='survey'?'block':'none';
+  document.getElementById('tab-stats').style.display=t==='stats'?'block':'none';
+  if(t==='stats') renderStats();
+}
+function goScreen(s) {
+  document.querySelectorAll('.screen').forEach(el=>el.classList.remove('active'));
+  document.getElementById('screen-'+s).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function startSurvey() {
+  const name=document.getElementById('inp-name').value.trim();
+  const gender=document.querySelector('input[name="gender"]:checked');
+  const age=document.getElementById('inp-age').value;
+  const parent=document.querySelector('input[name="parent"]:checked');
+  if(!name){alert('이름 또는 별명을 입력해주세요.');return;}
+  if(!gender){alert('성별을 선택해주세요.');return;}
+  if(!age){alert('연령대를 선택해주세요.');return;}
+  if(!parent){alert('양육자 여부를 선택해주세요.');return;}
+  userInfo={name,gender:gender.value,age,parent:parent.value};
+  QS=parent.value==='양육자'?QS_PARENT:QS_NON;
+  answers={}; curCat=0; renderCat(); goScreen('survey');
+}
+function renderCat() {
+  const cat=CATS[curCat],qs=QS[curCat],done=curCat*5;
+  document.getElementById('prog-cat').textContent=`카테고리 ${curCat+1}/6`;
+  document.getElementById('prog-pct').textContent=Math.round(done/30*100)+'%';
+  document.getElementById('prog-fill').style.width=(done/30*100)+'%';
+  document.getElementById('btn-prev').style.visibility=curCat===0?'hidden':'visible';
+  document.getElementById('btn-next').textContent=curCat===5?'결과 보기 →':'다음 →';
+  let html=`<div class="cat-hd"><div class="cat-badge" style="background:${cat.bg};color:${cat.color}">${cat.emoji}</div><h3 style="color:${cat.color}">${cat.id}. ${cat.label}</h3></div>`;
+  qs.forEach((q,qi)=>{
+    const gi=curCat*5+qi, isRev=REVERSED.includes(gi);
+    html+=`<div class="q-block"><div class="q-text"><span class="q-num-badge">Q${gi+1}</span>${q}${isRev?'<span class="q-reverse">역문항</span>':''}</div><div class="scale-row">`;
+    for(let s=1;s<=5;s++) html+=`<label><input type="radio" name="q${gi}" value="${s}" ${answers[gi]===s?'checked':''} onchange="answers[${gi}]=${s}"><div class="scale-cell"><div class="scale-num">${s}</div><div class="scale-lbl">${SLABELS[s-1]}</div></div></label>`;
+    html+=`</div></div>`;
+  });
+  document.getElementById('survey-content').innerHTML=html;
+  window.scrollTo({top:60,behavior:'smooth'});
+}
+function prevCat(){if(curCat>0){curCat--;renderCat();}}
+function nextCat(){
+  for(let qi=0;qi<5;qi++){if(!answers[curCat*5+qi]){alert('모든 문항에 답변해주세요.');return;}}
+  if(curCat<5){curCat++;renderCat();}else submitSurvey();
+}
+async function submitSurvey(){
+  const catScores=CATS.map((_,ci)=>{
+    let sum=0;
+    for(let qi=0;qi<5;qi++){const gi=ci*5+qi,raw=answers[gi];sum+=REVERSED.includes(gi)?(6-raw):raw;}
+    return{label:CATS[ci].label,score:sum,pct:Math.round(sum/25*100)};
+  });
+  const totalRaw=catScores.reduce((a,b)=>a+b.score,0);
+  const totalPct=Math.round(totalRaw/150*100);
+  const rec={...userInfo,catScores,totalRaw,totalPct};
+  document.getElementById('btn-next').textContent='저장 중...';
+  document.getElementById('btn-next').disabled=true;
+  try{await api('POST',{action:'saveResponse',payload:rec});}catch(e){}
+  renderResult(rec); goScreen('result');
+}
+function getGrade(p){
+  if(p>=90)return{label:'매우 높음 ⭐⭐⭐⭐⭐',color:'#1b5e20',bg:'#c8e6c9',msg:'성인지 감수성이 매우 높습니다! 성평등한 가치를 일상에서 잘 실천하고 계세요.'};
+  if(p>=75)return{label:'높음 ⭐⭐⭐⭐',color:'#2e7d32',bg:'#dcedc8',msg:'성인지 감수성이 높은 편입니다. 조금 더 관심을 기울이면 더욱 풍성해질 수 있어요.'};
+  if(p>=60)return{label:'보통 ⭐⭐⭐',color:'#f57f17',bg:'#fff9c4',msg:'보통 수준입니다. 일부 영역에서 더 깊은 이해가 필요할 수 있어요. 함께 배워가요!'};
+  if(p>=40)return{label:'낮음 ⭐⭐',color:'#e65100',bg:'#ffe0b2',msg:'성인지 감수성을 높일 여지가 있습니다. 다양한 자료와 대화를 통해 시각을 넓혀보세요.'};
+  return{label:'매우 낮음 ⭐',color:'#b71c1c',bg:'#ffcdd2',msg:'성인지 감수성을 키우는 것이 필요합니다. 작은 것부터 함께 고민해 보는 것이 좋아요.'};
+}
+function renderResult(rec){
+  const g=getGrade(rec.totalPct);
+  const catHtml=rec.catScores.map((cs,i)=>`<div class="ccard" style="background:${CATS[i].bg};color:${CATS[i].color}"><div class="ccard-name">${CATS[i].emoji} ${cs.label}</div><div class="ccard-score">${cs.score}<span style="font-size:.82rem;font-weight:500;">/25</span></div><div class="cbar"><div class="cfill" style="width:${cs.pct}%"></div></div></div>`).join('');
+  const badge=rec.parent==='양육자'?'<span style="background:#e8eaf6;color:#5c6bc0;font-size:.78rem;font-weight:700;padding:3px 10px;border-radius:99px;margin-left:6px;">👨‍👧 양육자</span>':'<span style="background:#e0f2f1;color:#26a69a;font-size:.78rem;font-weight:700;padding:3px 10px;border-radius:99px;margin-left:6px;">🙋 비양육자</span>';
+  document.getElementById('result-card').innerHTML=`
+    <div class="result-top">
+      <div class="result-name">${rec.name}님 ${badge}</div>
+      <div class="result-big">${rec.totalRaw}<span style="font-size:1.1rem;font-weight:500;color:var(--sub);"> / 150</span></div>
+      <div class="result-sub">(100점 환산: ${rec.totalPct}점)</div>
+      <div class="grade-pill" style="background:${g.bg};color:${g.color}">${g.label}</div>
+      <div class="result-msg">${g.msg}</div>
+    </div>
+    <div class="cat-grid2">${catHtml}</div>
+    <div style="margin-top:18px;"><div style="font-size:.95rem;font-weight:700;margin-bottom:12px;">📊 영역별 점수</div><div class="radar-wrap"><canvas id="r-chart"></canvas></div></div>`;
+  setTimeout(()=>{
+    const ctx=document.getElementById('r-chart').getContext('2d');
+    if(charts.r)charts.r.destroy();
+    charts.r=new Chart(ctx,{type:'radar',data:{labels:CATS.map(c=>c.label),datasets:[{label:'내 점수',data:rec.catScores.map(cs=>cs.pct),backgroundColor:'rgba(92,107,192,.2)',borderColor:'#5c6bc0',pointBackgroundColor:'#5c6bc0',pointRadius:4,borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,scales:{r:{min:0,max:100,ticks:{stepSize:25,font:{size:10}},pointLabels:{font:{size:11},color:'#424242'}}},plugins:{legend:{display:false}}}});
+  },100);
+}
+function resetSurvey(){
+  answers={}; curCat=0; userInfo={};
+  document.getElementById('inp-name').value='';
+  document.querySelectorAll('input[name="gender"]').forEach(r=>r.checked=false);
+  document.querySelectorAll('input[name="parent"]').forEach(r=>r.checked=false);
+  document.getElementById('inp-age').value='';
+  goScreen('intro');
+}
+async function tryReset(){
+  const pw=document.getElementById('admin-pw').value;
+  const msg=document.getElementById('admin-msg');
+  if(!confirm('정말로 모든 응답 데이터를 초기화하시겠습니까?\n이 작업은 되돌릴 수 없습니다.'))return;
+  try{
+    const res=await api('POST',{action:'resetData',password:pw});
+    if(res.success){msg.style.color='#2e7d32';msg.textContent='✅ 초기화되었습니다.';document.getElementById('admin-pw').value='';setTimeout(()=>renderStats(),800);}
+    else{msg.style.color='#c62828';msg.textContent='❌ '+res.message;}
+  }catch(e){msg.style.color='#c62828';msg.textContent='❌ 오류가 발생했습니다.';}
+}
+async function renderStats(){
+  const el=document.getElementById('stats-content');
+  el.innerHTML='<div style="text-align:center;padding:30px;font-size:1rem;"><span class="spinner"></span>데이터를 불러오는 중...</div>';
+  let recs=[];
+  try{const res=await api('GET');if(res.success&&res.data)recs=res.data;}
+  catch(e){el.innerHTML='<div class="card"><div class="empty"><div class="ei">⚠️</div><p>데이터를 불러오지 못했습니다.</p></div></div>';return;}
+  const adminBox=`<div class="card" style="border:2px solid #ffcdd2;margin-top:4px;">
+    <div style="font-size:.95rem;font-weight:700;margin-bottom:4px;color:#c62828;">🔐 관리자 전용</div>
+    <div style="font-size:.85rem;color:var(--sub);margin-bottom:12px;">비밀번호를 입력하면 전체 응답 데이터를 초기화할 수 있습니다.</div>
+    <div style="display:flex;gap:8px;">
+      <input type="password" id="admin-pw" placeholder="비밀번호 입력" style="flex:1;padding:13px;border:2px solid var(--border);border-radius:10px;font-size:1rem;outline:none;">
+      <button onclick="tryReset()" style="padding:13px 16px;background:#c62828;color:#fff;border:none;border-radius:10px;font-size:.92rem;font-weight:700;cursor:pointer;white-space:nowrap;">초기화</button>
+    </div>
+    <div id="admin-msg" style="font-size:.85rem;margin-top:8px;min-height:20px;"></div>
+  </div>`;
+  if(!recs.length){el.innerHTML=`<div class="card"><div class="empty"><div class="ei">📭</div><p>아직 응답 데이터가 없습니다.<br>설문에 참여하면 통계가 나타납니다!</p></div></div>${adminBox}`;return;}
+  const total=recs.length;
+  const avg=Math.round(recs.reduce((a,b)=>a+Number(b.totalPct),0)/total);
+  const high=recs.filter(r=>Number(r.totalPct)>=75).length;
+  const catAvg=CATS.map((_,ci)=>Math.round(recs.reduce((a,b)=>a+Number(b.catScores[ci].score),0)/total/25*100));
+  const gMap={},aMap={},pMap={양육자:{sum:0,cnt:0},비양육자:{sum:0,cnt:0}};
+  recs.forEach(r=>{
+    if(!gMap[r.gender])gMap[r.gender]={sum:0,cnt:0};gMap[r.gender].sum+=Number(r.totalPct);gMap[r.gender].cnt++;
+    if(!aMap[r.age])aMap[r.age]={sum:0,cnt:0};aMap[r.age].sum+=Number(r.totalPct);aMap[r.age].cnt++;
+    if(r.parent&&pMap[r.parent]){pMap[r.parent].sum+=Number(r.totalPct);pMap[r.parent].cnt++;}
+  });
+  el.innerHTML=`
+    <div class="stat-row">
+      <div class="sbox"><div class="sv">${total}</div><div class="sl">총 참여자</div></div>
+      <div class="sbox"><div class="sv">${avg}</div><div class="sl">평균 점수</div></div>
+      <div class="sbox"><div class="sv">${Math.round(high/total*100)}%</div><div class="sl">높음 이상</div></div>
+    </div>
+    <div class="card"><div style="font-size:.95rem;font-weight:700;margin-bottom:12px;">📈 영역별 평균 (100점 기준)</div><div class="ch-wrap"><canvas id="c1"></canvas></div></div>
+    <div class="card"><div style="font-size:.95rem;font-weight:700;margin-bottom:12px;">👥 성별 평균 점수</div><div class="ch-wrap"><canvas id="c2"></canvas></div></div>
+    <div class="card"><div style="font-size:.95rem;font-weight:700;margin-bottom:12px;">📅 연령대별 평균 점수</div><div class="ch-wrap"><canvas id="c3"></canvas></div></div>
+    <div class="card"><div style="font-size:.95rem;font-weight:700;margin-bottom:12px;">👨‍👧 양육자 여부별 평균 점수</div><div class="ch-wrap"><canvas id="c4"></canvas></div></div>
+    ${adminBox}`;
+  setTimeout(()=>{
+    const cv=['--cat1','--cat2','--cat3','--cat4','--cat5','--cat6'],st=getComputedStyle(document.documentElement);
+    const cc=cv.map(v=>st.getPropertyValue(v).trim()+'bb');
+    if(charts.c1)charts.c1.destroy();
+    charts.c1=new Chart(document.getElementById('c1').getContext('2d'),{type:'bar',data:{labels:CATS.map(c=>c.label),datasets:[{data:catAvg,backgroundColor:cc,borderRadius:7}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:0,max:100,ticks:{stepSize:25}},x:{ticks:{font:{size:10}}}},plugins:{legend:{display:false}}}});
+    const gK=Object.keys(gMap),gD=gK.map(k=>Math.round(gMap[k].sum/gMap[k].cnt));
+    if(charts.c2)charts.c2.destroy();
+    charts.c2=new Chart(document.getElementById('c2').getContext('2d'),{type:'bar',data:{labels:gK,datasets:[{data:gD,backgroundColor:['rgba(92,107,192,.75)','rgba(236,64,122,.75)','rgba(102,187,106,.75)','rgba(255,167,38,.75)'],borderRadius:7}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:0,max:100,ticks:{stepSize:25}}},plugins:{legend:{display:false}}}});
+    const aO=['10대','20대','30대','40대','50대','60대 이상'],aK=aO.filter(a=>aMap[a]),aD=aK.map(a=>Math.round(aMap[a].sum/aMap[a].cnt));
+    if(charts.c3)charts.c3.destroy();
+    charts.c3=new Chart(document.getElementById('c3').getContext('2d'),{type:'bar',data:{labels:aK,datasets:[{data:aD,backgroundColor:'rgba(66,165,245,.75)',borderRadius:7}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:0,max:100,ticks:{stepSize:25}}},plugins:{legend:{display:false}}}});
+    const pL=Object.keys(pMap).filter(k=>pMap[k].cnt>0),pD=pL.map(k=>Math.round(pMap[k].sum/pMap[k].cnt));
+    if(charts.c4)charts.c4.destroy();
+    charts.c4=new Chart(document.getElementById('c4').getContext('2d'),{type:'bar',data:{labels:pL,datasets:[{data:pD,backgroundColor:['rgba(92,107,192,.75)','rgba(38,166,154,.75)'],borderRadius:7}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{min:0,max:100,ticks:{stepSize:25}}},plugins:{legend:{display:false}}}});
+  },100);
+}
+</script>
+</body>
+</html>
