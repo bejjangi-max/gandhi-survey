@@ -242,8 +242,14 @@ const SLABELS = ['전혀\n그렇지\n않다','그렇지\n않다','보통\n이다
 let answers={}, curCat=0, userInfo={}, charts={}, QS=QS_PARENT;
 
 async function api(method, body) {
-  if (method==='GET') { const r=await fetch(SCRIPT_URL+'?action=getStats'); return r.json(); }
-  const r=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(body)}); return r.json();
+  if (method==='GET') {
+    const r = await fetch(SCRIPT_URL+'?action=getStats', {redirect:'follow'});
+    return r.json();
+  }
+  // POST 대신 GET 파라미터로 우회 (CORS 문제 해결)
+  const params = encodeURIComponent(JSON.stringify(body));
+  const r = await fetch(SCRIPT_URL+'?payload='+params, {redirect:'follow'});
+  return r.json();
 }
 function goTab(t) {
   document.querySelectorAll('.nav-tab').forEach((el,i)=>el.classList.toggle('active',(i===0&&t==='survey')||(i===1&&t==='stats')));
