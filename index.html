@@ -285,7 +285,7 @@ function renderCat() {
   let html=`<div class="cat-hd"><div class="cat-badge" style="background:${cat.bg};color:${cat.color}">${cat.emoji}</div><h3 style="color:${cat.color}">${cat.id}. ${cat.label}</h3></div>`;
   qs.forEach((q,qi)=>{
     const gi=curCat*5+qi, isRev=REVERSED.includes(gi);
-    html+=`<div class="q-block"><div class="q-text"><span class="q-num-badge">Q${gi+1}</span>${q}${isRev?'<span class="q-reverse">역문항</span>':''}</div><div class="scale-row">`;
+    html+=`<div class="q-block"><div class="q-text"><span class="q-num-badge">Q${gi+1}</span>${q}</div><div class="scale-row">`;
     for(let s=1;s<=5;s++) html+=`<label><input type="radio" name="q${gi}" value="${s}" ${answers[gi]===s?'checked':''} onchange="answers[${gi}]=${s}"><div class="scale-cell"><div class="scale-num">${s}</div><div class="scale-lbl">${SLABELS[s-1]}</div></div></label>`;
     html+=`</div></div>`;
   });
